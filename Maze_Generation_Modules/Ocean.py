@@ -1,5 +1,7 @@
 import random
 import imp
+import copy
+from tkinter import filedialog as fd, messagebox as mb
 
 """
 Title: Ocean
@@ -30,15 +32,57 @@ defultM = [['wb', 'wt', 'wp', 'wt', 'wt', 'wt', 'wl', 'ed', 'wb', 'wt', 'wt', 'w
 ['wg', 'ec', 'et', 'ej', 'wg', 'er', 'ej', 'wx', 'ws', 'ec', 'et', 'et', 'et', 'et', 'ej', 'wd', 'eu', 'wd', 'eg', 'wg'],
 ['wc', 'wt', 'wt', 'wt', 'wq', 'wt', 'wt', 'wq', 'wq', 'wt', 'wt', 'wt', 'wt', 'wt', 'wt', 'wq', 'wt', 'wj', 'eu', 'wu']]
 
-
+filetypes = (
+        ('text files', '*.txt'),
+        ('All files', '*.*')
+    )
 class Ocean():
-    '''Takes the list above and turns it into the maze that gets displayed by the main file'''
-    """
-    Ocean class
-    """
-    WIDTH = 20
-    HEIGHT = 20
-    tmap = defultM
+    
+    
+
+    def loadm(file = ".\Mazes\Maze10x1.txt"):
+        tmap = []
+        
+        file = fd.askopenfile(filetypes=filetypes)
+        print(file)
+        tmap:list[str] = file.readlines()
+        lmap:list[list[str]] = []
+        line_size = tmap.pop(0).removesuffix('\n').split(' ')
+        line_start = tmap.pop(0).removesuffix('\n').split(' ')
+
+        for n in range(len(tmap)):
+
+            tmap[n] = tmap[n].strip('\n')
+
+            line = []
+            for mmmmm in tmap[n]: 
+                line.append(mmmmm)
+
+            lmap.append(line)
+
+
+        tmap = copy.deepcopy(lmap)
+
+        
+        XR, XY, YR, YY = int(line_start[0]), int(line_start[1]), int(line_start[2]), int(line_start[3]) 
+        WIDTH, HEIGHT = int(line_size[0]), int(line_size[1]) 
+        return tmap,XR,XY,YR,YY,WIDTH,HEIGHT
+    
+    
+    deorfi = mb.askquestion(message="Do You Want to Open From File?")
+
+    if deorfi == "yes":
+        tmap,XR,XY,YR,YY,WIDTH,HEIGHT = loadm()
+    else:
+        WIDTH = 20
+        HEIGHT = 20
+        tmap = defultM
+        XR = 7
+        XY = 0
+        YR = 18
+        YY = 19
+
+    
     def print(self):
         for row in self.tmap:
             for col in row:
@@ -46,3 +90,36 @@ class Ocean():
             print()
     def get(self, row,col):
         return self.tmap[row][col]
+
+    def shortest(shelf, start, finish):
+        vistited = {start}
+        q = [(start,0)]
+        steps = -1
+        while q and steps == 0:
+            (current,s) = q.pop(0)
+            if current == finish:
+                steps = s
+            else:
+                s=+1
+                up = (current[0]-1,current[1])
+                if shelf.can_move(*up):
+                    if not up in vistited:
+                        vistited.add(up)
+                        q.append((up,s))
+                down = (current[0]+1,current[1])
+                if shelf.can_move(*down):
+                    if not down in vistited:
+                        vistited.add(down)
+                        q.append((down,s))
+                left = (current[0],current[1]-1)
+                if shelf.can_move(*left):
+                    if not left in vistited:
+                        vistited.add(left)
+                        q.append((left,s))
+                right = (current[0],current[1]+1)
+                if shelf.can_move(*right):
+                    if not right in vistited:
+                        vistited.add(right)
+                        q.append((right,s))
+        print(steps)
+        return steps
