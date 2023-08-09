@@ -64,62 +64,74 @@ class Ocean():
         tmap = copy.deepcopy(lmap)
 
         
-        XR, XY, YR, YY = int(line_start[0]), int(line_start[1]), int(line_start[2]), int(line_start[3]) 
+        PX, PY, GX, GY = int(line_start[0]), int(line_start[1]), int(line_start[2]), int(line_start[3]) 
         WIDTH, HEIGHT = int(line_size[0]), int(line_size[1]) 
-        return tmap,XR,XY,YR,YY,WIDTH,HEIGHT
-    
+        return tmap,PX,PY,GX,GY,WIDTH,HEIGHT
     
     deorfi = mb.askquestion(message="Do You Want to Open From File?")
 
     if deorfi == "yes":
-        tmap,XR,XY,YR,YY,WIDTH,HEIGHT = loadm()
+        tmap,PX,PY,GX,GY,WIDTH,HEIGHT = loadm()
     else:
         WIDTH = 20
         HEIGHT = 20
         tmap = defultM
-        XR = 7
-        XY = 0
-        YR = 18
-        YY = 19
+        PX = 7
+        PY = 0
+        GX = 18
+        GY = 19
 
     
-    def print(self):
-        for row in self.tmap:
-            for col in row:
-                print(col,end ='')
-            print()
-    def get(self, row,col):
-        return self.tmap[row][col]
+    def print(shelf):
+        for row in shelf.tmap:
+            print(row )
+    def get(shelf, row,col):
+        return shelf.tmap[row][col]
+    
+    def can_move(shelf,pos) -> bool:
+        if pos[0]>= 0 and pos[1] >= 0 and pos[0] < shelf.HEIGHT and pos[1] < shelf.WIDTH:
+            return shelf.tmap[pos[0]][pos[1]][0] == 'e'
+        else:
+            return False
 
     def shortest(shelf, start, finish):
         vistited = {start}
         q = [(start,0)]
         steps = -1
-        while q and steps == 0:
+        while q and steps < 0:
             (current,s) = q.pop(0)
             if current == finish:
                 steps = s
             else:
                 s=+1
                 up = (current[0]-1,current[1])
-                if shelf.can_move(*up):
+                if shelf.can_move(up):
                     if not up in vistited:
                         vistited.add(up)
                         q.append((up,s))
                 down = (current[0]+1,current[1])
-                if shelf.can_move(*down):
+                if shelf.can_move(down):
                     if not down in vistited:
                         vistited.add(down)
                         q.append((down,s))
                 left = (current[0],current[1]-1)
-                if shelf.can_move(*left):
+                if shelf.can_move(left):
                     if not left in vistited:
                         vistited.add(left)
                         q.append((left,s))
                 right = (current[0],current[1]+1)
-                if shelf.can_move(*right):
+                if shelf.can_move(right):
                     if not right in vistited:
                         vistited.add(right)
                         q.append((right,s))
-        print(steps)
         return steps
+    
+def main():
+    print("hello")
+    ocean= Ocean()
+    ocean.print()
+    row = ocean.HEIGHT
+    print(ocean.shortest((ocean.PX,ocean.PY),(ocean.PX,ocean.PY+1)))
+
+if __name__ == "__main__":
+    main()

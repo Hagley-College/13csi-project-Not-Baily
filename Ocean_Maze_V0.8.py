@@ -139,10 +139,11 @@ class GameGUI():
         shelf.frame = Frame(master)
         shelf.frame.pack()
         shelf.ocean = Ocean.Ocean()
-        shelf.boris = Swim.Sprite("Boris",shelf.ocean.XY,7)
-        shelf.boat = Swim.Sprite("Boat",19,18)
-        start=(shelf.ocean.XY,shelf.ocean.XR)
-        finish=(shelf.ocean.YY,shelf.ocean.YR)
+        shelf.boris = Swim.Sprite("Boris",shelf.ocean.PY,shelf.ocean.PX)
+        shelf.boat = Swim.Sprite("Boat",shelf.ocean.GY,shelf.ocean.GX)
+        start=(shelf.ocean.PY,shelf.ocean.PX)
+        finish=(shelf.ocean.GY,shelf.ocean.GX)
+        shelf.sp=shelf.ocean.shortest(start,finish)
         print(f'\nMaze Height = {shelf.ocean.HEIGHT}\nMaze Width = {shelf.ocean.WIDTH}')
         # Set up images
         shelf.wmg_vault = {"w":PhotoImage(file=("./Wssets/W.png")),"wa":PhotoImage(file=("./Wssets/A.png")),"wb":PhotoImage(file=("./Wssets/B.png")),"wc":PhotoImage(file=("./Wssets/C.png")),"wd":PhotoImage(file=("./Wssets/D.png")),"wg":PhotoImage(file=("./Wssets/G.png")),"wi":PhotoImage(file=("./Wssets/I.png")),"wj":PhotoImage(file=("./Wssets/J.png")),"wl":PhotoImage(file=("./Wssets/L.png")),"wn":PhotoImage(file=("./Wssets/N.png")),"wp":PhotoImage(file=("./Wssets/P.png")),"wq":PhotoImage(file=("./Wssets/Q.png")),"wr":PhotoImage(file=("./Wssets/R.png")),"ws":PhotoImage(file=("./Wssets/S.png")),"wt":PhotoImage(file=("./Wssets/T.png")),"wu":PhotoImage(file=("./Wssets/U.png")),"wx":PhotoImage(file=("./Wssets/X.png"))}
@@ -236,6 +237,11 @@ class GameGUI():
             shelf.Short = Button(shelf.frame, text=f"Total: {shelf.A}", cursor=random.choice(shelf.cursoz), command=lambda event :nothinghere("hellu"))
             shelf.Short.grid(row=21, column=1)
 
+        shelf.sptext = StringVar()
+        shelf.sptext.set(f"Short Path: {shelf.sp}")
+        shelf.sp_label = Label(shelf.frame, textvariable=shelf.sptext)
+        shelf.sp_label.grid(row=0, column=1)
+        
         #Keybinds
         #fa6665 
         
@@ -408,7 +414,7 @@ class GameGUI():
             return False
 
     
-
+    
 
 
 
