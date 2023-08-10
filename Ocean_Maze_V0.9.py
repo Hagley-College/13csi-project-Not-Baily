@@ -2,32 +2,41 @@
 'Title: Ocean Maze'
 Author: Bailey Reid
 Date: 29/07/22
-Version: 0.8
+Version: 0.9
 Purpose:
 https://tkdocs.com/tutorial/index.html
 """
+
+''''All *double hash*(color) *double hash* are for an extention I use that highlighs the code that is contained in (can't use the character thing or it breaks)'''
+#Example ##red would make the text red
 from tkinter import Tk, NW, Canvas, StringVar, Frame, Button, Label, PhotoImage, Menu, Text, messagebox, Toplevel  # import Tk (Tcl/Tk) Interface,
 import tkinter.simpledialog as Tksm
 import sys
 import random
 import sys
+from time import sleep
 
 import pathlib
 sys.path.insert(0,"Maze_Generation_Modules")
 
 import Swim
 import Ocean
-
-#Enables Debug Mode Which Unlocks Tools To Help Finding Bugs (True = Debug Mode on, False = Debug Mode off)
+##
 
 
 
 #Asks if the player wants buttons to be enabled
-movesys = messagebox.askquestion(message='Do You Want To Be Able To Use Buttons?',icon='question', title='Maze Setup')
-if movesys == 'yes':
-    AreButtons = True
+
+streamline = Ocean.streamline
+
+if streamline == False:
+    movesys = messagebox.askquestion(message='Do You Want To Be Able To Use Buttons?',icon='question', title='Maze Setup')
+    if movesys == 'yes':
+        AreButtons = True
+    else:
+        AreButtons = False
 else:
-    AreButtons = False
+    AreButtons = True
 
 class GameGUI():
     """
@@ -52,6 +61,7 @@ class GameGUI():
     Au = 0
     Al = 0
     Ar = 0
+    sp = 0
 
     def WinPop(shelf):
         """This is the win screen system so when you get to the goal at the end of the maze"""
@@ -82,7 +92,7 @@ class GameGUI():
         """This is what happens when the boat hits the player instad of the player hitting the boat"""
         print('Exception in Boat callback\nTraceback (most recent call last):\n  File "Ocean_Maze_V0.8.py", line ∞, in <collision>\n    if Swim.Sprite.hit(shelf,shelf.boris,shelf.boat):\nUnexpectedError: "You are not supposed to hit the player with the boat"')
 
-
+    ##orange Draw Map
     def draw(shelf, canvas):
         """
         the draw map method"""
@@ -99,10 +109,10 @@ class GameGUI():
 
                 else:
                     print("Idfk Man")
-            canvas.create_image(shelf.boat.col*32,shelf.boat.row*32,image = shelf.BoatImg,anchor=NW)
-            #canvas.create_image(shelf.End.col*32,shelf.End.row*32,image = shelf.endimg,anchor=NW)
-            canvas.create_image(shelf.boris.col*32,shelf.boris.row*32,image = shelf.BorisImg,anchor=NW)
-
+            canvas.create_image(shelf.boat.col*32+2,shelf.boat.row*32+2,image = shelf.BoatImg,anchor=NW)
+            canvas.create_image(shelf.boris.col*32+2,shelf.boris.row*32+2,image = shelf.BorisImg,anchor=NW)
+            canvas.create_image(shelf.boris.col*32+2,shelf.boris.row*32+2,image = shelf.BorisClImg,anchor=NW)
+    ##
     def move(shelf,x,y):
         """Both the movement system and the win colision system for Boris"""
         
@@ -134,21 +144,22 @@ class GameGUI():
             """Function that's used as a placeholder for when a function isn't yet created"""
             print(event)
 
-        
+    ##green   
         """the initiate method imports images"""
         shelf.frame = Frame(master)
         shelf.frame.pack()
         shelf.ocean = Ocean.Ocean()
         shelf.boris = Swim.Sprite("Boris",shelf.ocean.PY,shelf.ocean.PX)
         shelf.boat = Swim.Sprite("Boat",shelf.ocean.GY,shelf.ocean.GX)
-        start=(shelf.ocean.PY,shelf.ocean.PX)
-        finish=(shelf.ocean.GY,shelf.ocean.GX)
-        shelf.sp=shelf.ocean.shortest(start,finish)
+        shelf.start=(shelf.ocean.PY,shelf.ocean.PX)
+        shelf.finish=(shelf.ocean.GY,shelf.ocean.GX)
         print(f'\nMaze Height = {shelf.ocean.HEIGHT}\nMaze Width = {shelf.ocean.WIDTH}')
+        shelf.path_short()
         # Set up images
         shelf.wmg_vault = {"w":PhotoImage(file=("./Wssets/W.png")),"wa":PhotoImage(file=("./Wssets/A.png")),"wb":PhotoImage(file=("./Wssets/B.png")),"wc":PhotoImage(file=("./Wssets/C.png")),"wd":PhotoImage(file=("./Wssets/D.png")),"wg":PhotoImage(file=("./Wssets/G.png")),"wi":PhotoImage(file=("./Wssets/I.png")),"wj":PhotoImage(file=("./Wssets/J.png")),"wl":PhotoImage(file=("./Wssets/L.png")),"wn":PhotoImage(file=("./Wssets/N.png")),"wp":PhotoImage(file=("./Wssets/P.png")),"wq":PhotoImage(file=("./Wssets/Q.png")),"wr":PhotoImage(file=("./Wssets/R.png")),"ws":PhotoImage(file=("./Wssets/S.png")),"wt":PhotoImage(file=("./Wssets/T.png")),"wu":PhotoImage(file=("./Wssets/U.png")),"wx":PhotoImage(file=("./Wssets/X.png"))}
         shelf.emg_vault = {"e":PhotoImage(file=("./Essets/E.png")),"ea":PhotoImage(file=("./Essets/E.png")),"eb":PhotoImage(file=("./Essets/EB.png")),"ec":PhotoImage(file=("./Essets/EC.png")),"ed":PhotoImage(file=("./Essets/ED.png")),"eg":PhotoImage(file=("./Essets/EG.png")),"ei":PhotoImage(file=("./Essets/EI.png")),"ej":PhotoImage(file=("./Essets/EJ.png")),"el":PhotoImage(file=("./Essets/EL.png")),"en":PhotoImage(file=("./Essets/EN.png")),"ep":PhotoImage(file=("./Essets/EP.png")),"eq":PhotoImage(file=("./Essets/EQ.png")),"er":PhotoImage(file=("./Essets/ER.png")),"es":PhotoImage(file=("./Essets/ES.png")),"et":PhotoImage(file=("./Essets/ET.png")),"eu":PhotoImage(file=("./Essets/EU.png")),"ex":PhotoImage(file=("./Essets/EX.png"))}
-        shelf.BorisImg = PhotoImage(file=pathlib.Path("./Assets/Boris_32x32.png"))
+        shelf.BorisImg = PhotoImage(file=pathlib.Path("./Bssets/BorisHappy.png"))
+        shelf.BorisClImg = PhotoImage(file=pathlib.Path("./Bssets/BorisRed.png"))
         shelf.BoatImg = PhotoImage(file=pathlib.Path("./Assets/Bag_32x32.png"))
         # set up canvas for map
         shelf.maze_canvas = Canvas(shelf.frame, bg='#ffffff', height=shelf.ocean.HEIGHT * 32, width=shelf.ocean.WIDTH * 32)
@@ -158,15 +169,13 @@ class GameGUI():
         # set title of window
         shelf.frame.master.wm_title('Lmao Maze')
         shelf.frame.master.wm_iconbitmap(pathlib.Path("./Assets/Boris.ico"))
-
+    ##
 
 
 
         
-        ##Menu Bars
-        ##ff0000 
-
-        #Adds all the menu bars that sit on the top of the screen when playing
+        ##blue Menu Bars
+        
         shelf.menubar = Menu(shelf.frame)
         shelf.frame.master.config(menu=shelf.menubar)
         
@@ -180,9 +189,9 @@ class GameGUI():
         
         shelf.helpmenu = Menu(shelf.menubar,tearoff=0)
         
-        shelf.helpmenu.add_command(label="Help",command=shelf.HelpMenu)
+        shelf.helpmenu.add_command(label="Help",command=lambda :shelf.menus("help"))
         shelf.helpmenu.add_separator()
-        shelf.helpmenu.add_command(label="About",command=shelf.About)
+        shelf.helpmenu.add_command(label="About",command=lambda :shelf.menus("about"))
         
         shelf.menubar.add_cascade(label="About",menu=shelf.helpmenu)
 
@@ -202,6 +211,8 @@ class GameGUI():
             shelf.debugmenu.add_separator()
             shelf.debugmenu.add_command(label="Move Per Step",command=shelf.Move_Step)
             shelf.debugmenu.add_separator()
+            shelf.debugmenu.add_command(label="Update Assets",command=shelf.debug_upasset)
+            shelf.debugmenu.add_separator()
 
             
             shelf.debugmenu.add_command(label="Call Function",command=shelf.debug_funct)
@@ -210,11 +221,10 @@ class GameGUI():
 
 
 
-        shelf.frame.master['menu'] = shelf.menubar
+        shelf.frame.master['menu'] = shelf.menubar ##
 
-    
-        ##Buttons
         
+        #Buttons
         if AreButtons == True:
             
             """Method of placing buttons on the window if option "yes" is picked"""
@@ -234,13 +244,20 @@ class GameGUI():
             shelf.boR = Button(shelf.frame, text=f"Right: {shelf.Ar}", cursor=random.choice(shelf.cursoz), command=shelf.RMove)
             shelf.boR.grid(row=21, column=2)
 
-            shelf.Short = Button(shelf.frame, text=f"Total: {shelf.A}", cursor=random.choice(shelf.cursoz), command=lambda event :nothinghere("hellu"))
+            shelf.Short = Button(shelf.frame, text=f"Total: {shelf.A}", cursor=random.choice(shelf.cursoz), command=shelf.path_short)
             shelf.Short.grid(row=21, column=1)
 
-        shelf.sptext = StringVar()
-        shelf.sptext.set(f"Short Path: {shelf.sp}")
-        shelf.sp_label = Label(shelf.frame, textvariable=shelf.sptext)
-        shelf.sp_label.grid(row=0, column=1)
+            shelf.sp_label = Label(shelf.frame, text=f"Shortest Path: {shelf.sp}")
+            shelf.sp_label.grid(row=0, column=1)
+        else:
+            shelf.toalz=Label(shelf.frame, text="Total: 0")
+            shelf.toalz.grid(row=0, column=0)
+
+            shelf.sp_label = Label(shelf.frame, text=f"Shortest Path: {shelf.sp}")
+            shelf.sp_label.grid(row=0, column=2)
+
+
+        
         
         #Keybinds
         #fa6665 
@@ -252,9 +269,9 @@ class GameGUI():
         master.bind('d', lambda event: shelf.RMove())
         master.bind('<Escape>', lambda event: shelf.frame.master.destroy())
         
+        
 
         #Boat Keybinds
-        
         
         #The same as the other keybinds but allows the Boat (Goal) to be moved with UJHK instead
         master.bind('u', lambda event: shelf.UMoveB())
@@ -285,17 +302,20 @@ class GameGUI():
         shelf.boR.configure(text=f"Right: {shelf.Ar}",bg="#ffffff")
         shelf.Short.configure(text=f"Total: {shelf.A}",bg="#ffffff")
 
-    def About(shelf):
-        """Module for displaying infomation about the maze game thing"""
-        messagebox.showinfo('About', "Title: Ocean Maze\nAuthor: Bailey Reid\nVersion: 0.8\nAn attempt to create a somewhat interesting maze")
 
-    def HelpMenu(shelf):
-        """Explains how to play the game and what your objective is"""
-        if AreButtons == True:
-            messagebox.showinfo('Help', 'Your main goal is to reach the boat at the other end of the maze, touching it will make you win.\n\nYou have two movement options WASD and the buttons at the bottem of your screen.\n\nWASD are four keys on the keyboard that coraspond to the four directions you can move Up(W), Down(S), Left(L) and Right(D).\n\nThe Buttons are arrange in a way to make it easy to tell which direction they coraspond to, for exaample the button on top moves the character up.\n\nIf you go to config and turn on the "Movable Boat Toggle" it will enable you to move the boat as well (the controlls are differnt for the boat: U=Up, H=Right, L=Left and J=Down)')
-        else:
-            messagebox.showinfo('Help', 'Your main goal is to reach the boat at the other end of the maze, touching it will make you win.\n\nThe way to controll the character on screen is using WASD\nWASD are four keys on the keyboard that coraspond to the four directions you can move Up(W), Down(S), Left(L) and Right(D).\n\nIf you go to config and turn on the "Movable Boat Toggle" it will enable you to move the boat as well (the controlls are differnt for the boat: U=Up, H=Right, L=Left and J=Down)')
-
+    def menus(shelf,opt):
+        """Module for the two menu bars that display infomation"""
+        if opt == "about":
+            """Module for displaying infomation about the maze game thing"""
+            messagebox.showinfo('About', "Title: Ocean Maze\nAuthor: Bailey Reid\nVersion: 0.9\nAn attempt to create a somewhat interesting maze")
+        elif opt == "help":
+            """Explains how to play the game and what your objective is"""
+            if AreButtons == True:
+                messagebox.showinfo('Help', 'Your main goal is to reach the boat at the other end of the maze, touching it will make you win.\n\nYou have two movement options WASD and the buttons at the bottem of your screen.\n\nWASD are four keys on the keyboard that coraspond to the four directions you can move Up(W), Down(S), Left(L) and Right(D).\n\nThe Buttons are arrange in a way to make it easy to tell which direction they coraspond to, for exaample the button on top moves the character up.\n\nIf you go to config and turn on the "Movable Boat Toggle" it will enable you to move the boat as well (the controlls are differnt for the boat: U=Up, H=Right, L=Left and J=Down)')
+            else:
+                messagebox.showinfo('Help', 'Your main goal is to reach the boat at the other end of the maze, touching it will make you win.\n\nThe way to controll the character on screen is using WASD\nWASD are four keys on the keyboard that coraspond to the four directions you can move Up(W), Down(S), Left(L) and Right(D).\n\nIf you go to config and turn on the "Movable Boat Toggle" it will enable you to move the boat as well (the controlls are differnt for the boat: U=Up, H=Right, L=Left and J=Down)')
+        
+        
     def Move_Step(shelf):
         """Changes how many tiles you move per step"""
         
@@ -322,8 +342,7 @@ class GameGUI():
             #bor_step = 0
 
 
-    #Boris Movement System
-    
+    ##red Boris Movement System
     def UMove(shelf,distance=evom_step):
         """Moves Boris Up"""
         if "e" in shelf.ocean.get(shelf.boris.row-distance,shelf.boris.col):
@@ -338,6 +357,8 @@ class GameGUI():
 
                 shelf.boU.configure(text=f"Up: {shelf.Au}", bg=f"{hex_number}", cursor=random.choice(shelf.cursoz))
                 shelf.Short.configure(text=f"Total: {shelf.A}")
+            else:
+                shelf.toalz.config(text=f"Total Moved: {shelf.A}")
     
     def DMove(shelf,distance=evom_step):
         """Moves Boris Down"""
@@ -353,7 +374,9 @@ class GameGUI():
 
                 shelf.boD.configure(text=f"Down: {shelf.Ad}", bg=f"{hex_number}", cursor=random.choice(shelf.cursoz))
                 shelf.Short.configure(text=f"Total: {shelf.A}")
-    
+            else:
+                shelf.toalz.config(text=f"Total Moved: {shelf.A}")
+
     def LMove(shelf,distance=evom_step):
         """Moves Boris Left"""
         if "e" in shelf.ocean.get(shelf.boris.row,shelf.boris.col-distance):
@@ -368,6 +391,8 @@ class GameGUI():
 
                 shelf.boL.configure(text=f"Left: {shelf.Al}", bg=f"{hex_number}", cursor=random.choice(shelf.cursoz))
                 shelf.Short.configure(text=f"Total: {shelf.A}")
+            else:
+                shelf.toalz.config(text=f"Total Moved: {shelf.A}")
 
     def RMove(shelf,distance=evom_step):
         """Moves Boris Right"""
@@ -382,8 +407,11 @@ class GameGUI():
                 hex_number = '#'+ hex_number [2:]
 
                 shelf.boR.configure(text=f"Right: {shelf.Ar}", bg=f"{hex_number}", cursor=random.choice(shelf.cursoz))
-                shelf.Short.configure(text=f"Total: {shelf.A}")
+                shelf.Short.configure(text=f"Total: {shelf.A}") 
+            else:
+                shelf.toalz.config(text=f"Total Moved: {shelf.A}")
 
+##
 
     #Boat Movement System
     
@@ -407,20 +435,27 @@ class GameGUI():
         
         shelf.moveBoat("right",shelf.boat_sttep)
 
-    def can_move(shelf,row,col) -> bool:
-        if row >= 0 and col >= 0 and row < shelf.height and col < shelf.width:
-            return shelf.maze[row][col] == 0
-        else:
-            return False
+
+    def path_short(shelf):
+        #for y in range(shelf.ocean.HEIGHT):
+        #    for x in range(shelf.ocean.WIDTH):
+        shelf.sp=shelf.ocean.shortest(shelf.start,shelf.finish)
+
+    def openmaze(shelf):
+        shelf.ocean.loadm()
+        shelf.Picker.restartS(shelf.ocean.PY,shelf.ocean.PX)
+        shelf.Stoot.restartS(shelf.ocean.PY,shelf.ocean.PX)
+        shelf.End.restartS(shelf.ocean.GY,shelf.ocean.GX)
+        shelf.canvas_draw()
 
     
-    
+    def switchcl(shelf):
+        shelf.BorisClImg = PhotoImage(file=pathlib.Path("./Bssets/BorisBlue.png"))
+        shelf.draw(shelf.maze_canvas)
 
-
-
-    #Debug Commands
+    ##magenta Debug Commands
     def debug_print(shelf):
-        """Prints all info of both Boris and the `Boa`t (Goal)"""
+        """Prints all info of both Boris and the Boat (Goal)"""
         print("\nBoris Info:")
         Swim.Sprite.print(shelf.boris)
         print("Boat (or Goal) Info:")
@@ -439,10 +474,17 @@ class GameGUI():
         shelf.boris.col = Xo
         shelf.boris.row = Yo
         shelf.draw(shelf.maze_canvas)
+    
+    def debug_upasset(shelf):
+        shelf.wmg_vault = {"w":PhotoImage(file=("./Wssets/W.png")),"wa":PhotoImage(file=("./Wssets/A.png")),"wb":PhotoImage(file=("./Wssets/B.png")),"wc":PhotoImage(file=("./Wssets/C.png")),"wd":PhotoImage(file=("./Wssets/D.png")),"wg":PhotoImage(file=("./Wssets/G.png")),"wi":PhotoImage(file=("./Wssets/I.png")),"wj":PhotoImage(file=("./Wssets/J.png")),"wl":PhotoImage(file=("./Wssets/L.png")),"wn":PhotoImage(file=("./Wssets/N.png")),"wp":PhotoImage(file=("./Wssets/P.png")),"wq":PhotoImage(file=("./Wssets/Q.png")),"wr":PhotoImage(file=("./Wssets/R.png")),"ws":PhotoImage(file=("./Wssets/S.png")),"wt":PhotoImage(file=("./Wssets/T.png")),"wu":PhotoImage(file=("./Wssets/U.png")),"wx":PhotoImage(file=("./Wssets/X.png"))}
+        shelf.emg_vault = {"e":PhotoImage(file=("./Essets/E.png")),"ea":PhotoImage(file=("./Essets/E.png")),"eb":PhotoImage(file=("./Essets/EB.png")),"ec":PhotoImage(file=("./Essets/EC.png")),"ed":PhotoImage(file=("./Essets/ED.png")),"eg":PhotoImage(file=("./Essets/EG.png")),"ei":PhotoImage(file=("./Essets/EI.png")),"ej":PhotoImage(file=("./Essets/EJ.png")),"el":PhotoImage(file=("./Essets/EL.png")),"en":PhotoImage(file=("./Essets/EN.png")),"ep":PhotoImage(file=("./Essets/EP.png")),"eq":PhotoImage(file=("./Essets/EQ.png")),"er":PhotoImage(file=("./Essets/ER.png")),"es":PhotoImage(file=("./Essets/ES.png")),"et":PhotoImage(file=("./Essets/ET.png")),"eu":PhotoImage(file=("./Essets/EU.png")),"ex":PhotoImage(file=("./Essets/EX.png"))}
+        shelf.BorisImg = PhotoImage(file=pathlib.Path("./Assets/BorisRed.png"))
+        shelf.BoatImg = PhotoImage(file=pathlib.Path("./Assets/Bag_32x32.png"))
+        shelf.draw(shelf.maze_canvas)
 
     def debug_funct(shelf):
         """Gives the ability to call any function in the game (Unless it isn't in the dictionary below)"""
-        function_dict = {'debug_move':shelf.debug_move,'debug_print':shelf.debug_print,"WinPop":shelf.WinPop,"Restart":shelf.Restart,"HelpMenu":shelf.HelpMenu,"BoatMoveSet":shelf.BoatMoveSet,"boat_colosion":shelf.boat_colosion}
+        function_dict = {'debug_move':shelf.debug_move,'debug_print':shelf.debug_print,"WinPop":shelf.WinPop,"Restart":shelf.Restart,"BoatMoveSet":shelf.BoatMoveSet,"boat_colosion":shelf.boat_colosion,"debug_upasset":shelf.debug_upasset,"switchcl":shelf.switchcl}
         z = Tksm.askstring("Maze Debug Config", "Please input name of function you want to call")
         if z == '':
             None
@@ -452,7 +494,7 @@ class GameGUI():
             else:
                 print("\nInvalid Function\n")
     
-
+## 
 
 root = Tk()
 abc = GameGUI(root)

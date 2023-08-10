@@ -36,6 +36,8 @@ filetypes = (
         ('text files', '*.txt'),
         ('All files', '*.*')
     )
+
+streamline = True
 class Ocean():
     
     
@@ -68,7 +70,10 @@ class Ocean():
         WIDTH, HEIGHT = int(line_size[0]), int(line_size[1]) 
         return tmap,PX,PY,GX,GY,WIDTH,HEIGHT
     
-    deorfi = mb.askquestion(message="Do You Want to Open From File?")
+    if streamline == False:
+        deorfi = mb.askquestion(message="Do You Want to Open From File?")
+    else:
+        deorfi = "no"
 
     if deorfi == "yes":
         tmap,PX,PY,GX,GY,WIDTH,HEIGHT = loadm()
@@ -103,7 +108,7 @@ class Ocean():
             if current == finish:
                 steps = s
             else:
-                s=+1
+                s+=1
                 up = (current[0]-1,current[1])
                 if shelf.can_move(up):
                     if not up in vistited:
@@ -131,7 +136,7 @@ def main():
     ocean= Ocean()
     ocean.print()
     row = ocean.HEIGHT
-    print(ocean.shortest((ocean.PX,ocean.PY),(ocean.PX,ocean.PY+1)))
+    print(ocean.shortest((1,1),(2,2)))
 
 if __name__ == "__main__":
     main()
