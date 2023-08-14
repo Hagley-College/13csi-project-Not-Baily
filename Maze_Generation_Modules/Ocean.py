@@ -37,7 +37,7 @@ filetypes = (
         ('All files', '*.*')
     )
 
-streamline = True
+streamline = False
 class Ocean():
     
     
@@ -66,9 +66,9 @@ class Ocean():
         tmap = copy.deepcopy(lmap)
 
         
+        WIDTH, HEIGHT, TILESIZEX, TILESIZEY = int(line_size[0]), int(line_size[1]), int(line_size[2]), int(line_size[3]) 
         PX, PY, GX, GY = int(line_start[0]), int(line_start[1]), int(line_start[2]), int(line_start[3]) 
-        WIDTH, HEIGHT = int(line_size[0]), int(line_size[1]) 
-        return tmap,PX,PY,GX,GY,WIDTH,HEIGHT
+        return tmap,PX,PY,GX,GY,WIDTH,HEIGHT,TILESIZEX,TILESIZEY
     
     if streamline == False:
         deorfi = mb.askquestion(message="Do You Want to Open From File?")
@@ -76,7 +76,7 @@ class Ocean():
         deorfi = "no"
 
     if deorfi == "yes":
-        tmap,PX,PY,GX,GY,WIDTH,HEIGHT = loadm()
+        tmap,PX,PY,GX,GY,WIDTH,HEIGHT,TILESIZEX,TILESIZEY = loadm()
     else:
         WIDTH = 20
         HEIGHT = 20
@@ -85,6 +85,8 @@ class Ocean():
         PY = 0
         GX = 18
         GY = 19
+        TILESIZEX = 32
+        TILESIZEY = 32
 
     
     def print(shelf):

@@ -15,6 +15,8 @@ import sys
 import random
 import sys
 from time import sleep
+from PIL import Image, ImageTk
+
 
 import pathlib
 sys.path.insert(0,"Maze_Generation_Modules")
@@ -63,6 +65,10 @@ class GameGUI():
     Ar = 0
     sp = 0
 
+    sprit = 'norm'
+
+    restarted = False
+
     def WinPop(shelf):
         """This is the win screen system so when you get to the goal at the end of the maze"""
         #Col = Left/Right
@@ -101,31 +107,56 @@ class GameGUI():
             for col in range(shelf.ocean.WIDTH):
                 if "e" in shelf.ocean.get(row,col):
                     dub = shelf.ocean.get(row,col)
-                    canvas.create_image((col * 32)+2, (row * 32)+2, image=shelf.emg_vault[dub], anchor=NW)
+                    canvas.create_image((col * shelf.ocean.TILESIZEY)+2, (row * shelf.ocean.TILESIZEX)+2, image=shelf.emg_vault[dub], anchor=NW)
                 #
                 elif "w" in shelf.ocean.get(row,col):
                     dub = shelf.ocean.get(row,col)
-                    canvas.create_image((col * 32)+2, (row * 32)+2, image=shelf.wmg_vault[dub], anchor=NW)
+                    canvas.create_image((col * shelf.ocean.TILESIZEY)+2, (row * shelf.ocean.TILESIZEX)+2, image=shelf.wmg_vault[dub], anchor=NW)
 
                 else:
                     print("Idfk Man")
-            canvas.create_image(shelf.boat.col*32+2,shelf.boat.row*32+2,image = shelf.BoatImg,anchor=NW)
-            canvas.create_image(shelf.boris.col*32+2,shelf.boris.row*32+2,image = shelf.BorisImg,anchor=NW)
-            canvas.create_image(shelf.boris.col*32+2,shelf.boris.row*32+2,image = shelf.BorisClImg,anchor=NW)
-    ##
+            canvas.create_image(shelf.boat.col*shelf.ocean.TILESIZEX+2,shelf.boat.row*shelf.ocean.TILESIZEY+2,image = shelf.BoatImg,anchor=NW)
+            canvas.create_image(shelf.boris.col*shelf.ocean.TILESIZEX+2,shelf.boris.row*shelf.ocean.TILESIZEY+2,image = shelf.BorisImg,anchor=NW)
+            canvas.create_image(shelf.boris.col*shelf.ocean.TILESIZEX+2,shelf.boris.row*shelf.ocean.TILESIZEY+2,image = shelf.BorisClImg,anchor=NW)
+## ##pink
     def move(shelf,x,y):
         """Both the movement system and the win colision system for Boris"""
         
         shelf.boris.move(x,y,shelf.ocean)
         shelf.draw(shelf.maze_canvas)
-        if shelf.HasWon == False:
-            if Swim.Sprite.hit(shelf,shelf.boris,shelf.boat):
+        shelf.restarted = False
+        if Swim.Sprite.hit(shelf,shelf.boris,shelf.boat):
+            if shelf.HasWon == False:
                 print("You Win!!!")
                 shelf.WinPop()
                 shelf.HasWon = True
-        else:
+        elif shelf.A >= shelf.sp-1:
+            shelf.BorisImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisLineFace.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
+            shelf.BorisClImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisBlue.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
+            shelf.draw(shelf.maze_canvas)
+            if shelf.A >= shelf.sp+24:
+                shelf.BorisImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisAngrey.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
+                shelf.BorisClImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisRed.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
+                shelf.draw(shelf.maze_canvas)
+                if shelf.A >= shelf.sp+59:
+                    shelf.BorisImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisSad.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
+                    shelf.draw(shelf.maze_canvas)
+                    shelf.almostdead
+            
+    def almostdead(shelf):
+        if shelf.restarted == True:
             None
+        else:
+            if shelf.sprit == "alt":
+                shelf.sprit = "norm"
+                shelf.BorisClImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisRed.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
+            else:
+                shelf.sprit = "alt"
+                shelf.BorisClImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisRedAlt.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
+            shelf.draw(shelf.maze_canvas)
+            shelf.Short.after(500,shelf.almostdead)
 
+    
     def moveBoat(shelf,x,y):
         """Both the movement system and the colision system for the Boat (Goal)"""
         shelf.boat.move(x,y,shelf.ocean)
@@ -136,6 +167,7 @@ class GameGUI():
                 shelf.error_has = True
         else:
             None
+##
 
     def __init__(shelf,master):
         
@@ -156,13 +188,13 @@ class GameGUI():
         print(f'\nMaze Height = {shelf.ocean.HEIGHT}\nMaze Width = {shelf.ocean.WIDTH}')
         shelf.path_short()
         # Set up images
-        shelf.wmg_vault = {"w":PhotoImage(file=("./Wssets/W.png")),"wa":PhotoImage(file=("./Wssets/A.png")),"wb":PhotoImage(file=("./Wssets/B.png")),"wc":PhotoImage(file=("./Wssets/C.png")),"wd":PhotoImage(file=("./Wssets/D.png")),"wg":PhotoImage(file=("./Wssets/G.png")),"wi":PhotoImage(file=("./Wssets/I.png")),"wj":PhotoImage(file=("./Wssets/J.png")),"wl":PhotoImage(file=("./Wssets/L.png")),"wn":PhotoImage(file=("./Wssets/N.png")),"wp":PhotoImage(file=("./Wssets/P.png")),"wq":PhotoImage(file=("./Wssets/Q.png")),"wr":PhotoImage(file=("./Wssets/R.png")),"ws":PhotoImage(file=("./Wssets/S.png")),"wt":PhotoImage(file=("./Wssets/T.png")),"wu":PhotoImage(file=("./Wssets/U.png")),"wx":PhotoImage(file=("./Wssets/X.png"))}
-        shelf.emg_vault = {"e":PhotoImage(file=("./Essets/E.png")),"ea":PhotoImage(file=("./Essets/E.png")),"eb":PhotoImage(file=("./Essets/EB.png")),"ec":PhotoImage(file=("./Essets/EC.png")),"ed":PhotoImage(file=("./Essets/ED.png")),"eg":PhotoImage(file=("./Essets/EG.png")),"ei":PhotoImage(file=("./Essets/EI.png")),"ej":PhotoImage(file=("./Essets/EJ.png")),"el":PhotoImage(file=("./Essets/EL.png")),"en":PhotoImage(file=("./Essets/EN.png")),"ep":PhotoImage(file=("./Essets/EP.png")),"eq":PhotoImage(file=("./Essets/EQ.png")),"er":PhotoImage(file=("./Essets/ER.png")),"es":PhotoImage(file=("./Essets/ES.png")),"et":PhotoImage(file=("./Essets/ET.png")),"eu":PhotoImage(file=("./Essets/EU.png")),"ex":PhotoImage(file=("./Essets/EX.png"))}
-        shelf.BorisImg = PhotoImage(file=pathlib.Path("./Bssets/BorisHappy.png"))
-        shelf.BorisClImg = PhotoImage(file=pathlib.Path("./Bssets/BorisRed.png"))
-        shelf.BoatImg = PhotoImage(file=pathlib.Path("./Assets/Bag_32x32.png"))
+        shelf.wmg_vault = {"w":ImageTk.PhotoImage(Image.open("./Wssets/W.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wa":ImageTk.PhotoImage(Image.open("./Wssets/A.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wb":ImageTk.PhotoImage(Image.open("./Wssets/B.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wc":ImageTk.PhotoImage(Image.open("./Wssets/C.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wd":ImageTk.PhotoImage(Image.open("./Wssets/D.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wg":ImageTk.PhotoImage(Image.open("./Wssets/G.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wi":ImageTk.PhotoImage(Image.open("./Wssets/I.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wj":ImageTk.PhotoImage(Image.open("./Wssets/J.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wl":ImageTk.PhotoImage(Image.open("./Wssets/L.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wn":ImageTk.PhotoImage(Image.open("./Wssets/N.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wp":ImageTk.PhotoImage(Image.open("./Wssets/P.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wq":ImageTk.PhotoImage(Image.open("./Wssets/Q.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wr":ImageTk.PhotoImage(Image.open("./Wssets/R.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"ws":ImageTk.PhotoImage(Image.open("./Wssets/S.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wt":ImageTk.PhotoImage(Image.open("./Wssets/T.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wu":ImageTk.PhotoImage(Image.open("./Wssets/U.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wx":ImageTk.PhotoImage(Image.open("./Wssets/X.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))}
+        shelf.emg_vault = {"e":ImageTk.PhotoImage(Image.open("./Essets/E.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"ea":ImageTk.PhotoImage(Image.open("./Essets/E.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"eb":ImageTk.PhotoImage(Image.open("./Essets/EB.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"ec":ImageTk.PhotoImage(Image.open("./Essets/EC.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"ed":ImageTk.PhotoImage(Image.open("./Essets/ED.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"eg":ImageTk.PhotoImage(Image.open("./Essets/EG.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"ei":ImageTk.PhotoImage(Image.open("./Essets/EI.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"ej":ImageTk.PhotoImage(Image.open("./Essets/EJ.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"el":ImageTk.PhotoImage(Image.open("./Essets/EL.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"en":ImageTk.PhotoImage(Image.open("./Essets/EN.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"ep":ImageTk.PhotoImage(Image.open("./Essets/EP.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"eq":ImageTk.PhotoImage(Image.open("./Essets/EQ.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"er":ImageTk.PhotoImage(Image.open("./Essets/ER.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"es":ImageTk.PhotoImage(Image.open("./Essets/ES.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"et":ImageTk.PhotoImage(Image.open("./Essets/ET.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"eu":ImageTk.PhotoImage(Image.open("./Essets/EU.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"ex":ImageTk.PhotoImage(Image.open("./Essets/EX.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))}
+        shelf.BorisImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisHappy.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
+        shelf.BorisClImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisGreen.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
+        shelf.BoatImg = ImageTk.PhotoImage(Image.open("./Assets/Bag_32x32.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
         # set up canvas for map
-        shelf.maze_canvas = Canvas(shelf.frame, bg='#ffffff', height=shelf.ocean.HEIGHT * 32, width=shelf.ocean.WIDTH * 32)
+        shelf.maze_canvas = Canvas(shelf.frame, bg='#ffffff', height=shelf.ocean.HEIGHT * shelf.ocean.TILESIZEY, width=shelf.ocean.WIDTH * shelf.ocean.TILESIZEX)
         shelf.maze_canvas.grid(row=1, column=0, columnspan=3, rowspan=3)
         shelf.draw(shelf.maze_canvas)
 
@@ -199,7 +231,10 @@ class GameGUI():
         shelf.configmenu = Menu(shelf.menubar,tearoff=0)
 
         shelf.configmenu.add_command(label="Movable Boat Toggle",command=shelf.BoatMoveSet)
-       
+        shelf.configmenu.add_separator()
+        shelf.configmenu.add_command(label="Animate Asset",command=shelf.almostdead)
+
+
         shelf.menubar.add_cascade(label="Config",menu=shelf.configmenu)
 
         if shelf.DebugMode == True:
@@ -244,7 +279,7 @@ class GameGUI():
             shelf.boR = Button(shelf.frame, text=f"Right: {shelf.Ar}", cursor=random.choice(shelf.cursoz), command=shelf.RMove)
             shelf.boR.grid(row=21, column=2)
 
-            shelf.Short = Button(shelf.frame, text=f"Total: {shelf.A}", cursor=random.choice(shelf.cursoz), command=shelf.path_short)
+            shelf.Short = Button(shelf.frame, text=f"Total: {shelf.A}", cursor=random.choice(shelf.cursoz), command=shelf.almostdead)
             shelf.Short.grid(row=21, column=1)
 
             shelf.sp_label = Label(shelf.frame, text=f"Shortest Path: {shelf.sp}")
@@ -285,9 +320,9 @@ class GameGUI():
     def Restart(shelf):
         """Module for restarting the game once the player has either won or decided to restart via the file menu"""
         
-        shelf.boris.restartS(0,7)
-        shelf.boat.restartS(19,18)
-        shelf.draw(shelf.maze_canvas)
+        shelf.boris.restartS(shelf.ocean.PY,shelf.ocean.PX)
+        shelf.boat.restartS(shelf.ocean.GY,shelf.ocean.GX)
+        shelf.restarted = True
         shelf.HasWon = False
         
         shelf.A = 0
@@ -301,6 +336,9 @@ class GameGUI():
         shelf.boL.configure(text=f"Left: {shelf.Al}",bg="#ffffff")
         shelf.boR.configure(text=f"Right: {shelf.Ar}",bg="#ffffff")
         shelf.Short.configure(text=f"Total: {shelf.A}",bg="#ffffff")
+        shelf.BorisImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisHappy.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
+        shelf.BorisClImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisGreen.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
+        shelf.draw(shelf.maze_canvas)
 
 
     def menus(shelf,opt):
@@ -450,7 +488,8 @@ class GameGUI():
 
     
     def switchcl(shelf):
-        shelf.BorisClImg = PhotoImage(file=pathlib.Path("./Bssets/BorisBlue.png"))
+        shelf.BorisImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisShocked.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
+        shelf.BorisClImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisBlue.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
         shelf.draw(shelf.maze_canvas)
 
     ##magenta Debug Commands
@@ -476,10 +515,10 @@ class GameGUI():
         shelf.draw(shelf.maze_canvas)
     
     def debug_upasset(shelf):
-        shelf.wmg_vault = {"w":PhotoImage(file=("./Wssets/W.png")),"wa":PhotoImage(file=("./Wssets/A.png")),"wb":PhotoImage(file=("./Wssets/B.png")),"wc":PhotoImage(file=("./Wssets/C.png")),"wd":PhotoImage(file=("./Wssets/D.png")),"wg":PhotoImage(file=("./Wssets/G.png")),"wi":PhotoImage(file=("./Wssets/I.png")),"wj":PhotoImage(file=("./Wssets/J.png")),"wl":PhotoImage(file=("./Wssets/L.png")),"wn":PhotoImage(file=("./Wssets/N.png")),"wp":PhotoImage(file=("./Wssets/P.png")),"wq":PhotoImage(file=("./Wssets/Q.png")),"wr":PhotoImage(file=("./Wssets/R.png")),"ws":PhotoImage(file=("./Wssets/S.png")),"wt":PhotoImage(file=("./Wssets/T.png")),"wu":PhotoImage(file=("./Wssets/U.png")),"wx":PhotoImage(file=("./Wssets/X.png"))}
-        shelf.emg_vault = {"e":PhotoImage(file=("./Essets/E.png")),"ea":PhotoImage(file=("./Essets/E.png")),"eb":PhotoImage(file=("./Essets/EB.png")),"ec":PhotoImage(file=("./Essets/EC.png")),"ed":PhotoImage(file=("./Essets/ED.png")),"eg":PhotoImage(file=("./Essets/EG.png")),"ei":PhotoImage(file=("./Essets/EI.png")),"ej":PhotoImage(file=("./Essets/EJ.png")),"el":PhotoImage(file=("./Essets/EL.png")),"en":PhotoImage(file=("./Essets/EN.png")),"ep":PhotoImage(file=("./Essets/EP.png")),"eq":PhotoImage(file=("./Essets/EQ.png")),"er":PhotoImage(file=("./Essets/ER.png")),"es":PhotoImage(file=("./Essets/ES.png")),"et":PhotoImage(file=("./Essets/ET.png")),"eu":PhotoImage(file=("./Essets/EU.png")),"ex":PhotoImage(file=("./Essets/EX.png"))}
-        shelf.BorisImg = PhotoImage(file=pathlib.Path("./Assets/BorisRed.png"))
-        shelf.BoatImg = PhotoImage(file=pathlib.Path("./Assets/Bag_32x32.png"))
+        shelf.wmg_vault = {"w":ImageTk.PhotoImage(Image.open("./Wssets/W.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wa":ImageTk.PhotoImage(Image.open("./Wssets/A.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wb":ImageTk.PhotoImage(Image.open("./Wssets/B.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wc":ImageTk.PhotoImage(Image.open("./Wssets/C.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wd":ImageTk.PhotoImage(Image.open("./Wssets/D.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wg":ImageTk.PhotoImage(Image.open("./Wssets/G.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wi":ImageTk.PhotoImage(Image.open("./Wssets/I.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wj":ImageTk.PhotoImage(Image.open("./Wssets/J.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wl":ImageTk.PhotoImage(Image.open("./Wssets/L.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wn":ImageTk.PhotoImage(Image.open("./Wssets/N.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wp":ImageTk.PhotoImage(Image.open("./Wssets/P.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wq":ImageTk.PhotoImage(Image.open("./Wssets/Q.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wr":ImageTk.PhotoImage(Image.open("./Wssets/R.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"ws":ImageTk.PhotoImage(Image.open("./Wssets/S.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wt":ImageTk.PhotoImage(Image.open("./Wssets/T.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wu":ImageTk.PhotoImage(Image.open("./Wssets/U.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wx":ImageTk.PhotoImage(Image.open("./Wssets/X.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))}
+        shelf.emg_vault = {"e":ImageTk.PhotoImage(Image.open("./Essets/E.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"ea":ImageTk.PhotoImage(Image.open("./Essets/E.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"eb":ImageTk.PhotoImage(Image.open("./Essets/EB.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"ec":ImageTk.PhotoImage(Image.open("./Essets/EC.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"ed":ImageTk.PhotoImage(Image.open("./Essets/ED.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"eg":ImageTk.PhotoImage(Image.open("./Essets/EG.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"ei":ImageTk.PhotoImage(Image.open("./Essets/EI.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"ej":ImageTk.PhotoImage(Image.open("./Essets/EJ.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"el":ImageTk.PhotoImage(Image.open("./Essets/EL.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"en":ImageTk.PhotoImage(Image.open("./Essets/EN.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"ep":ImageTk.PhotoImage(Image.open("./Essets/EP.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"eq":ImageTk.PhotoImage(Image.open("./Essets/EQ.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"er":ImageTk.PhotoImage(Image.open("./Essets/ER.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"es":ImageTk.PhotoImage(Image.open("./Essets/ES.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"et":ImageTk.PhotoImage(Image.open("./Essets/ET.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"eu":ImageTk.PhotoImage(Image.open("./Essets/EU.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"ex":ImageTk.PhotoImage(Image.open("./Essets/EX.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))}
+        shelf.BorisImg = ImageTk.PhotoImage(Image.open("./Assets/BorisRed.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
+        shelf.BoatImg = ImageTk.PhotoImage(Image.open("./Assets/Bag_32x32.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
         shelf.draw(shelf.maze_canvas)
 
     def debug_funct(shelf):
