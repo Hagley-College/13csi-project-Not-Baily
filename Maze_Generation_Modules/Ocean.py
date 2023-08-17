@@ -37,7 +37,7 @@ filetypes = (
         ('All files', '*.*')
     )
 
-streamline = True
+streamline = False
 class Ocean():
     
     

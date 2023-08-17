@@ -323,7 +323,7 @@ class GameGUI():
         master.bind('a', lambda event: shelf.LMove())
         master.bind('d', lambda event: shelf.RMove())
         master.bind('<Escape>', lambda event: shelf.frame.master.destroy())
-        
+        master.bind('<space>', lambda event: shelf.path_short)
         
 
         #Boat Keybinds
@@ -505,21 +505,26 @@ class GameGUI():
         #    for x in range(shelf.ocean.WIDTH):
         #for mive in range(len(shelf.path_taken)):
         pos = (shelf.boris.row,shelf.boris.col)
-        print(pos)
-        print(shelf.path_taken[-1])
         if pos == shelf.path_taken[-1]:
             print("Done/Already Did")
 
             shelf.drawchar()
         else:
-            print(f"x = {shelf.path_taken[mive][1]}, y = {shelf.path_taken[mive][0]}")
-            shelf.boris.col = shelf.path_taken[mive][1]
-            shelf.boris.row = shelf.path_taken[mive][0]
-
-            shelf.drawchar()
+            if shelf.path_taken[mive][0] > shelf.boris.row and shelf.path_taken[mive][1] == shelf.boris.col:
+                shelf.DMove()
+                shelf.drawchar()
+            elif shelf.path_taken[mive][0] < shelf.boris.row and shelf.path_taken[mive][1] == shelf.boris.col:
+                shelf.UMove()
+                shelf.drawchar()
+            elif shelf.path_taken[mive][0] == shelf.boris.row and shelf.path_taken[mive][1] > shelf.boris.col:
+                shelf.RMove()
+                shelf.drawchar()
+            elif shelf.path_taken[mive][0] == shelf.boris.row and shelf.path_taken[mive][1] < shelf.boris.col:
+                shelf.LMove()
+                shelf.drawchar()
             
             mive+=1
-            root.after(5000,shelf.path_short(mive))
+            root.after(1,shelf.path_short(mive))
             
 
     def openmaze(shelf):
