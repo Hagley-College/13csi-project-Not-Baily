@@ -69,6 +69,7 @@ class GameGUI():
 
     restarted = False
 
+
     def WinPop(shelf):
         """This is the win screen system so when you get to the goal at the end of the maze"""
         #Col = Left/Right
@@ -106,42 +107,52 @@ class GameGUI():
         for row in range(shelf.ocean.HEIGHT):
             for col in range(shelf.ocean.WIDTH):
                 if "e" in shelf.ocean.get(row,col):
-                    dub = shelf.ocean.get(row,col)
-                    canvas.create_image((col * shelf.ocean.TILESIZEY)+2, (row * shelf.ocean.TILESIZEX)+2, image=shelf.emg_vault[dub], anchor=NW)
+                    #dub = shelf.ocean.get(row,col)
+                    #canvas.create_image((col * shelf.ocean.TILESIZEY)+2, (row * shelf.ocean.TILESIZEX)+2, image=shelf.emg_vault[dub], anchor=NW)
+                    canvas.create_rectangle((col * shelf.ocean.TILESIZEY)+2, (row * shelf.ocean.TILESIZEX)+2, (col * shelf.ocean.TILESIZEY)+shelf.ocean.TILESIZEY+2, (row * shelf.ocean.TILESIZEX)+shelf.ocean.TILESIZEX+2, fill="white")
                 #
                 elif "w" in shelf.ocean.get(row,col):
-                    dub = shelf.ocean.get(row,col)
-                    canvas.create_image((col * shelf.ocean.TILESIZEY)+2, (row * shelf.ocean.TILESIZEX)+2, image=shelf.wmg_vault[dub], anchor=NW)
+                    #dub = shelf.ocean.get(row,col)
+                    #canvas.create_image((col * shelf.ocean.TILESIZEY)+2, (row * shelf.ocean.TILESIZEX)+2, image=shelf.wmg_vault[dub], anchor=NW)
+                    canvas.create_rectangle((col * shelf.ocean.TILESIZEY)+2, (row * shelf.ocean.TILESIZEX)+2, (col * shelf.ocean.TILESIZEY)+shelf.ocean.TILESIZEY+2, (row * shelf.ocean.TILESIZEX)+shelf.ocean.TILESIZEX+2, fill="black")
 
                 else:
                     print("Idfk Man")
-            canvas.create_image(shelf.boat.col*shelf.ocean.TILESIZEX+2,shelf.boat.row*shelf.ocean.TILESIZEY+2,image = shelf.BoatImg,anchor=NW)
-            canvas.create_image(shelf.boris.col*shelf.ocean.TILESIZEX+2,shelf.boris.row*shelf.ocean.TILESIZEY+2,image = shelf.BorisImg,anchor=NW)
-            canvas.create_image(shelf.boris.col*shelf.ocean.TILESIZEX+2,shelf.boris.row*shelf.ocean.TILESIZEY+2,image = shelf.BorisClImg,anchor=NW)
+        canvas.create_image(shelf.boat.col*shelf.ocean.TILESIZEX+2,shelf.boat.row*shelf.ocean.TILESIZEY+2,image = shelf.BoatImg,anchor=NW)
 ## ##pink
     def move(shelf,x,y):
         """Both the movement system and the win colision system for Boris"""
         
         shelf.boris.move(x,y,shelf.ocean)
-        shelf.draw(shelf.maze_canvas)
         shelf.restarted = False
+        
+        shelf.drawchar()
+        
+        
         if Swim.Sprite.hit(shelf,shelf.boris,shelf.boat):
             if shelf.HasWon == False:
                 print("You Win!!!")
                 shelf.WinPop()
                 shelf.HasWon = True
-        elif shelf.A >= shelf.sp-1:
+
+        elif shelf.A >= shelf.sp-1 and shelf.A <= shelf.sp+1:
             shelf.BorisImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisLineFace.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
             shelf.BorisClImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisBlue.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
-            shelf.draw(shelf.maze_canvas)
-            if shelf.A >= shelf.sp+24:
-                shelf.BorisImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisAngrey.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
-                shelf.BorisClImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisRed.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
-                shelf.draw(shelf.maze_canvas)
-                if shelf.A >= shelf.sp+59:
-                    shelf.BorisImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisSad.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
-                    shelf.draw(shelf.maze_canvas)
-                    shelf.almostdead
+            
+            shelf.drawchar()
+
+        elif shelf.A >= shelf.sp+24 and shelf.A <= shelf.sp+26:
+            shelf.BorisImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisAngrey.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
+            shelf.BorisClImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisRed.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
+            
+            shelf.drawchar()
+
+        elif shelf.A >= shelf.sp+59 and shelf.A <= shelf.sp+61:
+            shelf.BorisImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisSad.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
+            
+            shelf.drawchar()
+            
+            shelf.almostdead
             
     def almostdead(shelf):
         if shelf.restarted == True:
@@ -153,8 +164,11 @@ class GameGUI():
             else:
                 shelf.sprit = "alt"
                 shelf.BorisClImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisRedAlt.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
-            shelf.draw(shelf.maze_canvas)
-            shelf.Short.after(500,shelf.almostdead)
+
+            shelf.maze_canvas.delete(shelf.BorC)
+            shelf.BorC = shelf.maze_canvas.create_image(shelf.boris.col*shelf.ocean.TILESIZEX+2,shelf.boris.row*shelf.ocean.TILESIZEY+2,image = shelf.BorisClImg,anchor=NW)
+
+            root.after(500,shelf.almostdead)
 
     
     def moveBoat(shelf,x,y):
@@ -186,7 +200,7 @@ class GameGUI():
         shelf.start=(shelf.ocean.PY,shelf.ocean.PX)
         shelf.finish=(shelf.ocean.GY,shelf.ocean.GX)
         print(f'\nMaze Height = {shelf.ocean.HEIGHT}\nMaze Width = {shelf.ocean.WIDTH}')
-        shelf.path_short()
+        
         # Set up images
         shelf.wmg_vault = {"w":ImageTk.PhotoImage(Image.open("./Wssets/W.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wa":ImageTk.PhotoImage(Image.open("./Wssets/A.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wb":ImageTk.PhotoImage(Image.open("./Wssets/B.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wc":ImageTk.PhotoImage(Image.open("./Wssets/C.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wd":ImageTk.PhotoImage(Image.open("./Wssets/D.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wg":ImageTk.PhotoImage(Image.open("./Wssets/G.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wi":ImageTk.PhotoImage(Image.open("./Wssets/I.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wj":ImageTk.PhotoImage(Image.open("./Wssets/J.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wl":ImageTk.PhotoImage(Image.open("./Wssets/L.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wn":ImageTk.PhotoImage(Image.open("./Wssets/N.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wp":ImageTk.PhotoImage(Image.open("./Wssets/P.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wq":ImageTk.PhotoImage(Image.open("./Wssets/Q.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wr":ImageTk.PhotoImage(Image.open("./Wssets/R.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"ws":ImageTk.PhotoImage(Image.open("./Wssets/S.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wt":ImageTk.PhotoImage(Image.open("./Wssets/T.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wu":ImageTk.PhotoImage(Image.open("./Wssets/U.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"wx":ImageTk.PhotoImage(Image.open("./Wssets/X.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))}
         shelf.emg_vault = {"e":ImageTk.PhotoImage(Image.open("./Essets/E.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"ea":ImageTk.PhotoImage(Image.open("./Essets/E.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"eb":ImageTk.PhotoImage(Image.open("./Essets/EB.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"ec":ImageTk.PhotoImage(Image.open("./Essets/EC.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"ed":ImageTk.PhotoImage(Image.open("./Essets/ED.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"eg":ImageTk.PhotoImage(Image.open("./Essets/EG.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"ei":ImageTk.PhotoImage(Image.open("./Essets/EI.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"ej":ImageTk.PhotoImage(Image.open("./Essets/EJ.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"el":ImageTk.PhotoImage(Image.open("./Essets/EL.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"en":ImageTk.PhotoImage(Image.open("./Essets/EN.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"ep":ImageTk.PhotoImage(Image.open("./Essets/EP.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"eq":ImageTk.PhotoImage(Image.open("./Essets/EQ.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"er":ImageTk.PhotoImage(Image.open("./Essets/ER.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"es":ImageTk.PhotoImage(Image.open("./Essets/ES.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"et":ImageTk.PhotoImage(Image.open("./Essets/ET.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"eu":ImageTk.PhotoImage(Image.open("./Essets/EU.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX))),"ex":ImageTk.PhotoImage(Image.open("./Essets/EX.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))}
@@ -194,9 +208,15 @@ class GameGUI():
         shelf.BorisClImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisGreen.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
         shelf.BoatImg = ImageTk.PhotoImage(Image.open("./Assets/Bag_32x32.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
         # set up canvas for map
-        shelf.maze_canvas = Canvas(shelf.frame, bg='#ffffff', height=shelf.ocean.HEIGHT * shelf.ocean.TILESIZEY, width=shelf.ocean.WIDTH * shelf.ocean.TILESIZEX)
+        shelf.maze_canvas = Canvas(shelf.frame, bg='#F8C8DC', height=shelf.ocean.HEIGHT * shelf.ocean.TILESIZEY, width=shelf.ocean.WIDTH * shelf.ocean.TILESIZEX)
         shelf.maze_canvas.grid(row=1, column=0, columnspan=3, rowspan=3)
+        (shelf.sp,shelf.path_taken) = shelf.ocean.shortest(shelf.start,shelf.finish)
+        
         shelf.draw(shelf.maze_canvas)
+
+        shelf.BorI = shelf.maze_canvas.create_image(shelf.boris.col*shelf.ocean.TILESIZEX+2,shelf.boris.row*shelf.ocean.TILESIZEY+2,image = shelf.BorisImg,anchor=NW)
+        shelf.BorC = shelf.maze_canvas.create_image(shelf.boris.col*shelf.ocean.TILESIZEX+2,shelf.boris.row*shelf.ocean.TILESIZEY+2,image = shelf.BorisClImg,anchor=NW)
+
 
         # set title of window
         shelf.frame.master.wm_title('Lmao Maze')
@@ -279,7 +299,7 @@ class GameGUI():
             shelf.boR = Button(shelf.frame, text=f"Right: {shelf.Ar}", cursor=random.choice(shelf.cursoz), command=shelf.RMove)
             shelf.boR.grid(row=21, column=2)
 
-            shelf.Short = Button(shelf.frame, text=f"Total: {shelf.A}", cursor=random.choice(shelf.cursoz), command=shelf.almostdead)
+            shelf.Short = Button(shelf.frame, text=f"Total: {shelf.A}", cursor=random.choice(shelf.cursoz), command=shelf.path_short)
             shelf.Short.grid(row=21, column=1)
 
             shelf.sp_label = Label(shelf.frame, text=f"Shortest Path: {shelf.sp}")
@@ -331,11 +351,11 @@ class GameGUI():
         shelf.Al = 0
         shelf.Ar = 0
 
-        shelf.boU.configure(text=f"Up: {shelf.Au}",bg="#ffffff")
-        shelf.boD.configure(text=f"Down: {shelf.Ad}",bg="#ffffff")
-        shelf.boL.configure(text=f"Left: {shelf.Al}",bg="#ffffff")
-        shelf.boR.configure(text=f"Right: {shelf.Ar}",bg="#ffffff")
-        shelf.Short.configure(text=f"Total: {shelf.A}",bg="#ffffff")
+        shelf.boU.configure(text=f"Up: {shelf.Au}",bg="#F8C8DC")
+        shelf.boD.configure(text=f"Down: {shelf.Ad}",bg="#F8C8DC")
+        shelf.boL.configure(text=f"Left: {shelf.Al}",bg="#F8C8DC")
+        shelf.boR.configure(text=f"Right: {shelf.Ar}",bg="#F8C8DC")
+        shelf.Short.configure(text=f"Total: {shelf.A}",bg="#F8C8DC")
         shelf.BorisImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisHappy.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
         shelf.BorisClImg = ImageTk.PhotoImage(Image.open("./Bssets/BorisGreen.png").resize((shelf.ocean.TILESIZEY,shelf.ocean.TILESIZEX)))
         shelf.draw(shelf.maze_canvas)
@@ -473,11 +493,34 @@ class GameGUI():
         
         shelf.moveBoat("right",shelf.boat_sttep)
 
-
-    def path_short(shelf):
+    ##yellow
+    def drawchar(shelf):
+        shelf.maze_canvas.delete(shelf.BorI)
+        shelf.maze_canvas.delete(shelf.BorC)
+        shelf.BorI = shelf.maze_canvas.create_image(shelf.boris.col*shelf.ocean.TILESIZEX+2,shelf.boris.row*shelf.ocean.TILESIZEY+2,image = shelf.BorisImg,anchor=NW)
+        shelf.BorC = shelf.maze_canvas.create_image(shelf.boris.col*shelf.ocean.TILESIZEX+2,shelf.boris.row*shelf.ocean.TILESIZEY+2,image = shelf.BorisClImg,anchor=NW)
+##
+    def path_short(shelf,mive=0):
         #for y in range(shelf.ocean.HEIGHT):
         #    for x in range(shelf.ocean.WIDTH):
-        shelf.sp=shelf.ocean.shortest(shelf.start,shelf.finish)
+        #for mive in range(len(shelf.path_taken)):
+        pos = (shelf.boris.row,shelf.boris.col)
+        print(pos)
+        print(shelf.path_taken[-1])
+        if pos == shelf.path_taken[-1]:
+            print("Done/Already Did")
+
+            shelf.drawchar()
+        else:
+            print(f"x = {shelf.path_taken[mive][1]}, y = {shelf.path_taken[mive][0]}")
+            shelf.boris.col = shelf.path_taken[mive][1]
+            shelf.boris.row = shelf.path_taken[mive][0]
+
+            shelf.drawchar()
+            
+            mive+=1
+            root.after(5000,shelf.path_short(mive))
+            
 
     def openmaze(shelf):
         shelf.ocean.loadm()

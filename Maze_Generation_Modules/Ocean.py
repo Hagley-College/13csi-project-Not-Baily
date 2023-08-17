@@ -37,7 +37,7 @@ filetypes = (
         ('All files', '*.*')
     )
 
-streamline = False
+streamline = True
 class Ocean():
     
     
@@ -103,41 +103,41 @@ class Ocean():
 
     def shortest(shelf, start, finish):
         vistited = {start}
-        q = [(start,0)]
+        q = [(start,0,[start])]
         steps = -1
         while q and steps < 0:
-            (current,s) = q.pop(0)
+            (current,s,p) = q.pop(0)
             if current == finish:
                 steps = s
+                print(p)
             else:
                 s+=1
                 up = (current[0]-1,current[1])
                 if shelf.can_move(up):
                     if not up in vistited:
                         vistited.add(up)
-                        q.append((up,s))
+                        q.append((up,s,p+[up]))
                 down = (current[0]+1,current[1])
                 if shelf.can_move(down):
                     if not down in vistited:
                         vistited.add(down)
-                        q.append((down,s))
+                        q.append((down,s,p+[down]))
                 left = (current[0],current[1]-1)
                 if shelf.can_move(left):
                     if not left in vistited:
                         vistited.add(left)
-                        q.append((left,s))
+                        q.append((left,s,p+[left]))
                 right = (current[0],current[1]+1)
                 if shelf.can_move(right):
                     if not right in vistited:
                         vistited.add(right)
-                        q.append((right,s))
-        return steps
+                        q.append((right,s,p+[right]))
+        return steps, p
     
 def main():
     print("hello")
     ocean= Ocean()
     ocean.print()
-    row = ocean.HEIGHT
     print(ocean.shortest((1,1),(2,2)))
 
 if __name__ == "__main__":
