@@ -2,7 +2,7 @@
 'Title: Ocean Maze'
 Author: Bailey Reid
 Date: 29/07/22
-Version: 0.9
+Version: 0.11
 Purpose:
 https://tkdocs.com/tutorial/index.html
 """
@@ -107,14 +107,14 @@ class GameGUI():
         for row in range(shelf.ocean.HEIGHT):
             for col in range(shelf.ocean.WIDTH):
                 if "e" in shelf.ocean.get(row,col):
-                    #dub = shelf.ocean.get(row,col)
-                    #canvas.create_image((col * shelf.ocean.TILESIZEY)+2, (row * shelf.ocean.TILESIZEX)+2, image=shelf.emg_vault[dub], anchor=NW)
-                    canvas.create_rectangle((col * shelf.ocean.TILESIZEY)+2, (row * shelf.ocean.TILESIZEX)+2, (col * shelf.ocean.TILESIZEY)+shelf.ocean.TILESIZEY+2, (row * shelf.ocean.TILESIZEX)+shelf.ocean.TILESIZEX+2, fill="white")
+                    dub = shelf.ocean.get(row,col)
+                    canvas.create_image((col * shelf.ocean.TILESIZEY)+2, (row * shelf.ocean.TILESIZEX)+2, image=shelf.emg_vault[dub], anchor=NW)
+                    #canvas.create_rectangle((col * shelf.ocean.TILESIZEY)+2, (row * shelf.ocean.TILESIZEX)+2, (col * shelf.ocean.TILESIZEY)+shelf.ocean.TILESIZEY+2, (row * shelf.ocean.TILESIZEX)+shelf.ocean.TILESIZEX+2, fill="white")
                 #
                 elif "w" in shelf.ocean.get(row,col):
-                    #dub = shelf.ocean.get(row,col)
-                    #canvas.create_image((col * shelf.ocean.TILESIZEY)+2, (row * shelf.ocean.TILESIZEX)+2, image=shelf.wmg_vault[dub], anchor=NW)
-                    canvas.create_rectangle((col * shelf.ocean.TILESIZEY)+2, (row * shelf.ocean.TILESIZEX)+2, (col * shelf.ocean.TILESIZEY)+shelf.ocean.TILESIZEY+2, (row * shelf.ocean.TILESIZEX)+shelf.ocean.TILESIZEX+2, fill="black")
+                    dub = shelf.ocean.get(row,col)
+                    canvas.create_image((col * shelf.ocean.TILESIZEY)+2, (row * shelf.ocean.TILESIZEX)+2, image=shelf.wmg_vault[dub], anchor=NW)
+                    #canvas.create_rectangle((col * shelf.ocean.TILESIZEY)+2, (row * shelf.ocean.TILESIZEX)+2, (col * shelf.ocean.TILESIZEY)+shelf.ocean.TILESIZEY+2, (row * shelf.ocean.TILESIZEX)+shelf.ocean.TILESIZEX+2, fill="black")
 
                 else:
                     print("Idfk Man")
@@ -511,16 +511,17 @@ class GameGUI():
             shelf.drawchar()
         else:
             if shelf.path_taken[mive][0] > shelf.boris.row and shelf.path_taken[mive][1] == shelf.boris.col:
-                shelf.DMove()
+                #shelf.DMove()
+                shelf.boris.col = shelf.boris.col
                 shelf.drawchar()
             elif shelf.path_taken[mive][0] < shelf.boris.row and shelf.path_taken[mive][1] == shelf.boris.col:
-                shelf.UMove()
+                #shelf.UMove()
                 shelf.drawchar()
             elif shelf.path_taken[mive][0] == shelf.boris.row and shelf.path_taken[mive][1] > shelf.boris.col:
-                shelf.RMove()
+                #shelf.RMove()
                 shelf.drawchar()
             elif shelf.path_taken[mive][0] == shelf.boris.row and shelf.path_taken[mive][1] < shelf.boris.col:
-                shelf.LMove()
+                #shelf.LMove()
                 shelf.drawchar()
             
             mive+=1
@@ -532,7 +533,6 @@ class GameGUI():
         shelf.Picker.restartS(shelf.ocean.PY,shelf.ocean.PX)
         shelf.Stoot.restartS(shelf.ocean.PY,shelf.ocean.PX)
         shelf.End.restartS(shelf.ocean.GY,shelf.ocean.GX)
-        shelf.canvas_draw()
 
     
     def switchcl(shelf):
